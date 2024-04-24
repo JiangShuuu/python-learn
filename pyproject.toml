@@ -1,0 +1,20 @@
+[project]
+name = "python-course"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "John Lu", email = "john.lu@trans-iot.com"},
+]
+dependencies = [
+    "fastapi>=0.110.2",
+    "uvicorn>=0.29.0",
+    "sqlalchemy>=2.0.29",
+    "aiosqlite>=0.20.0",
+]
+requires-python = "==3.10.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
