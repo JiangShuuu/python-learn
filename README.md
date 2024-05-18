@@ -39,4 +39,6 @@ async def root():
 
 ```
 pdm run uvicorn main:app --reload
+or
+pdm run uvicorn main:app --reload --port 8000
 ```
