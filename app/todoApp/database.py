@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from app.config import env
@@ -8,6 +9,12 @@ database_url = f"postgresql://{env.db_username}:{env.db_password}@{env.db_host}:
 
 # 建立連接引擎
 engine = create_engine(database_url)
+
+SessionLocal: sessionmaker = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine
+)
+
+Base = declarative_base()
 
 async def connecnt_db():
     print('connect msg::')
