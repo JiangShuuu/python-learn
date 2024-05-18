@@ -22,6 +22,7 @@ class Book:
         self.rating = rating
         self.published_date = published_date
 
+
 class BookRequest(BaseModel):
     id: Optional[int] = None
     title: str = Field(min_length=3)
