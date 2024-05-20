@@ -5,10 +5,10 @@ from fastapi import HTTPException
 from config import env
 
 # 設定資料庫連線資訊
-database_url = f"postgresql://{env.db_username}:{env.db_password}@{env.db_host}:{env.db_port}/{env.db_name}"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{env.db_username}:{env.db_password}@{env.db_host}:{env.db_port}/{env.db_name}"
 
 # 建立連接引擎
-engine = create_engine(database_url)
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal: sessionmaker = sessionmaker(
     autocommit=False, autoflush=False, bind=engine
