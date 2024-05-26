@@ -7,7 +7,8 @@ class _Environment(BaseSettings):
     db_name: str
     db_username: str
     db_password: str
-
+    jwt_secret: str
+    jwt_algorithm: str
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
