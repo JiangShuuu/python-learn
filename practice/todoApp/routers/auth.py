@@ -7,7 +7,7 @@ from models import Users
 from database import get_db
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from jose import jwt
+from jose import jwt, JWTError
 from config import env
 from starlette import status
 
@@ -37,21 +37,20 @@ def create_access_token(username: str, user_id: str, expires_delta: timedelta):
         'id': user_id,
         'exp': datetime.now(timezone.utc) + expires_delta
     }
+    
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db):
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')
-        user_id: str = payload.get('id')
-    except jwt.JWTError:
-        raise HTTPException(status_code=400, detail="Invalid token")
-    user = db.query(Users).filter(Users.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not vaildate user")
-    if user.username!= username:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not vaildate user")
-    return user
+        user_id: int = payload.get('id')
+        if username is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not vaildate user")
+        return {'username': username, 'user_id': user_id}
+    except JWTError as e:
+        print('Decode error:', e)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -95,3 +94,17 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
 
     token = create_access_token(user.username, user.id, timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer '}
+
+@router.post('/test')
+async def test():
+    en = {
+        'sub': 'user123', 'id': 1, 'exp': datetime.now(timezone.utc)
+    }
+    token = jwt.encode(en, SECRET_KEY, algorithm=ALGORITHM)
+    print("Generated Token:", token)
+
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("Decoded Payload:", decoded)
+    except Exception as e:
+        print("Error decoding:", e)
